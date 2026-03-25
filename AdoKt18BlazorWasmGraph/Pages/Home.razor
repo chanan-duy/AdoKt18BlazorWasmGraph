@@ -1,23 +1,15 @@
 ﻿@page "/"
+@inject NavigationManager Navigation
 
-<PageTitle>Home</PageTitle>
+<PageTitle>loading</PageTitle>
 
-<div class="home-page py-4">
-	<h1 class="mb-3">blazor wasm graph</h1>
+<div class="py-5 text-secondary">loading sales chart...</div>
 
-	<p class="text-secondary mb-4">
-		This task adds a sales chart page that is loaded from a lazy assembly.
-	</p>
+@code {
 
-	<div class="card shadow-sm border-0">
-		<div class="card-body">
-			<h3 class="h5 mb-3">what is inside</h3>
+	protected override void OnInitialized()
+	{
+		Navigation.NavigateTo("/sales-chart");
+	}
 
-			<ul class="mb-0">
-				<li>a lazy-loaded page at <code>/sales-chart</code></li>
-				<li>a simple canvas chart rendered with javascript</li>
-				<li>a small sales summary with switchable demo periods</li>
-			</ul>
-		</div>
-	</div>
-</div>
+}

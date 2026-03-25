@@ -1,11 +1,10 @@
-@inject IJSRuntime JS
+@inject IJSRuntime Js
 
 <div class="card shadow-sm border-0">
 	<div class="card-body">
 		<div class="sales-toolbar mb-4">
 			<div>
-				<h3 class="h5 mb-1">demo sales data</h3>
-				<p class="text-secondary mb-0">change the period to redraw the chart.</p>
+				<h3 class="h5 mb-1">sales data</h3>
 			</div>
 
 			<div>
@@ -65,29 +64,30 @@
 
 @code {
 	private readonly string _canvasId = $"sales-chart-{Guid.NewGuid():N}";
+
 	private readonly Dictionary<string, List<SalesPoint>> _salesByPeriod = new(StringComparer.OrdinalIgnoreCase)
 	{
 		["last 6 months"] =
 		[
-			new("jan", 120),
-			new("feb", 160),
-			new("mar", 210),
-			new("apr", 190),
-			new("may", 260),
-			new("jun", 320)
+			new SalesPoint("jan", 120),
+			new SalesPoint("feb", 160),
+			new SalesPoint("mar", 210),
+			new SalesPoint("apr", 190),
+			new SalesPoint("may", 260),
+			new SalesPoint("jun", 320),
 		],
 		["q3 sample"] =
 		[
-			new("jul", 280),
-			new("aug", 340),
-			new("sep", 310)
+			new SalesPoint("jul", 280),
+			new SalesPoint("aug", 340),
+			new SalesPoint("sep", 310),
 		],
 		["q4 sample"] =
 		[
-			new("oct", 360),
-			new("nov", 410),
-			new("dec", 470)
-		]
+			new SalesPoint("oct", 360),
+			new SalesPoint("nov", 410),
+			new SalesPoint("dec", 470),
+		],
 	};
 
 	private string _selectedPeriod = "last 6 months";
@@ -108,7 +108,7 @@
 
 		_shouldRenderChart = false;
 
-		await JS.InvokeVoidAsync(
+		await Js.InvokeVoidAsync(
 			"salesChart.render",
 			_canvasId,
 			CurrentSalesData.Select(item => new { label = item.Label, amount = item.Amount }));
@@ -127,4 +127,5 @@
 	}
 
 	private sealed record SalesPoint(string Label, int Amount);
+
 }

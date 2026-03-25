@@ -1,14 +1,12 @@
 ﻿@inherits LayoutComponentBase
 <div class="page">
-	<div class="sidebar">
-		<NavMenu/>
-	</div>
-
-	<main>
-		<div class="top-row px-4">
-			<span class="text-muted small">blazor wasm graph demo</span>
+	<header class="top-row px-4">
+		<div class="layout-shell">
+			<span class="layout-title">sales chart</span>
 		</div>
+	</header>
 
+	<main class="main-content">
 		<article class="content px-4">
 			@Body
 		</article>
