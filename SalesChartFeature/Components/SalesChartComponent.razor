@@ -1,0 +1,130 @@
+@inject IJSRuntime JS
+
+<div class="card shadow-sm border-0">
+	<div class="card-body">
+		<div class="sales-toolbar mb-4">
+			<div>
+				<h3 class="h5 mb-1">demo sales data</h3>
+				<p class="text-secondary mb-0">change the period to redraw the chart.</p>
+			</div>
+
+			<div>
+				<label class="form-label mb-1" for="sales-period">period</label>
+				<select id="sales-period"
+				        class="form-select"
+				        value="@_selectedPeriod"
+				        @onchange="HandlePeriodChanged">
+					@foreach (var period in _salesByPeriod.Keys)
+					{
+						<option value="@period">@period</option>
+					}
+				</select>
+			</div>
+		</div>
+
+		<div class="sales-summary-grid mb-4">
+			<div class="sales-summary-card">
+				<div class="sales-summary-label">total</div>
+				<div class="sales-summary-value">@CurrentSalesData.Sum(item => item.Amount)</div>
+			</div>
+
+			<div class="sales-summary-card">
+				<div class="sales-summary-label">average</div>
+				<div class="sales-summary-value">@Math.Round(CurrentSalesData.Average(item => item.Amount), 0)</div>
+			</div>
+
+			<div class="sales-summary-card">
+				<div class="sales-summary-label">best month</div>
+				<div class="sales-summary-value">@BestMonth.Label</div>
+			</div>
+		</div>
+
+		<div class="sales-chart-shell mb-4">
+			<canvas id="@_canvasId" class="sales-chart-canvas"></canvas>
+		</div>
+
+		<table class="table table-striped sales-table mb-0">
+			<thead>
+			<tr>
+				<th>month</th>
+				<th class="text-end">amount</th>
+			</tr>
+			</thead>
+			<tbody>
+			@foreach (var item in CurrentSalesData)
+			{
+				<tr>
+					<td>@item.Label</td>
+					<td class="text-end">@item.Amount</td>
+				</tr>
+			}
+			</tbody>
+		</table>
+	</div>
+</div>
+
+@code {
+	private readonly string _canvasId = $"sales-chart-{Guid.NewGuid():N}";
+	private readonly Dictionary<string, List<SalesPoint>> _salesByPeriod = new(StringComparer.OrdinalIgnoreCase)
+	{
+		["last 6 months"] =
+		[
+			new("jan", 120),
+			new("feb", 160),
+			new("mar", 210),
+			new("apr", 190),
+			new("may", 260),
+			new("jun", 320)
+		],
+		["q3 sample"] =
+		[
+			new("jul", 280),
+			new("aug", 340),
+			new("sep", 310)
+		],
+		["q4 sample"] =
+		[
+			new("oct", 360),
+			new("nov", 410),
+			new("dec", 470)
+		]
+	};
+
+	private string _selectedPeriod = "last 6 months";
+	private bool _shouldRenderChart = true;
+
+	private IReadOnlyList<SalesPoint> CurrentSalesData => _salesByPeriod[_selectedPeriod];
+
+	private SalesPoint BestMonth => CurrentSalesData
+		.OrderByDescending(item => item.Amount)
+		.First();
+
+	protected override async Task OnAfterRenderAsync(bool firstRender)
+	{
+		if (!firstRender && !_shouldRenderChart)
+		{
+			return;
+		}
+
+		_shouldRenderChart = false;
+
+		await JS.InvokeVoidAsync(
+			"salesChart.render",
+			_canvasId,
+			CurrentSalesData.Select(item => new { label = item.Label, amount = item.Amount }));
+	}
+
+	private Task HandlePeriodChanged(ChangeEventArgs args)
+	{
+		var selectedPeriod = args.Value?.ToString();
+		if (!string.IsNullOrWhiteSpace(selectedPeriod) && _salesByPeriod.ContainsKey(selectedPeriod))
+		{
+			_selectedPeriod = selectedPeriod;
+			_shouldRenderChart = true;
+		}
+
+		return Task.CompletedTask;
+	}
+
+	private sealed record SalesPoint(string Label, int Amount);
+}

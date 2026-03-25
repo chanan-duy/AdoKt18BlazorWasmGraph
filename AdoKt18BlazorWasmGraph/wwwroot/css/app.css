@@ -1,5 +1,6 @@
 html, body {
     font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
+    background-color: #f6f8fb;
 }
 
 h1:focus {
@@ -112,4 +113,67 @@ code {
 
 .form-floating > .form-control-plaintext:focus::placeholder, .form-floating > .form-control:focus::placeholder {
     text-align: start;
+}
+
+.home-page,
+.sales-page {
+    max-width: 960px;
+}
+
+.sales-toolbar {
+    display: flex;
+    gap: 1rem;
+    align-items: end;
+    justify-content: space-between;
+    flex-wrap: wrap;
+}
+
+.sales-summary-grid {
+    display: grid;
+    gap: 1rem;
+    grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+}
+
+.sales-summary-card {
+    border: 1px solid #e9ecef;
+    border-radius: 0.75rem;
+    padding: 1rem;
+    background: #fff;
+}
+
+.sales-summary-label {
+    color: #6c757d;
+    font-size: 0.85rem;
+    text-transform: lowercase;
+}
+
+.sales-summary-value {
+    color: #1f2937;
+    font-size: 1.5rem;
+    font-weight: 700;
+}
+
+.sales-chart-shell {
+    border: 1px solid #e9ecef;
+    border-radius: 0.75rem;
+    background: linear-gradient(180deg, #ffffff 0%, #fbfcff 100%);
+    padding: 1rem;
+}
+
+.sales-chart-canvas {
+    width: 100%;
+    max-width: 100%;
+    height: 360px;
+    display: block;
+}
+
+.sales-table td,
+.sales-table th {
+    vertical-align: middle;
+}
+
+@media (max-width: 767.98px) {
+    .sales-chart-canvas {
+        height: 280px;
+    }
 }

@@ -1,7 +1,42 @@
-﻿@using AdoKt18BlazorWasmGraph.Pages
-<Router AppAssembly="@typeof(App).Assembly" NotFoundPage="typeof(NotFound)">
+﻿@using System.Reflection
+@using AdoKt18BlazorWasmGraph.Pages
+@using Microsoft.AspNetCore.Components.WebAssembly.Services
+@inject LazyAssemblyLoader AssemblyLoader
+
+<Router AppAssembly="@typeof(App).Assembly"
+        AdditionalAssemblies="@_lazyLoadedAssemblies"
+        OnNavigateAsync="LoadLazyAssembliesAsync"
+        NotFoundPage="typeof(NotFound)">
 	<Found Context="routeData">
 		<RouteView RouteData="@routeData" DefaultLayout="@typeof(MainLayout)"/>
 		<FocusOnNavigate RouteData="@routeData" Selector="h1"/>
 	</Found>
+	<Navigating>
+		<div class="alert alert-light border mt-3">loading page...</div>
+	</Navigating>
 </Router>
+
+@code {
+	private const string SalesChartAssemblyName = "SalesChartFeature.dll";
+	private readonly List<Assembly> _lazyLoadedAssemblies = [];
+
+	private async Task LoadLazyAssembliesAsync(NavigationContext context)
+	{
+		var route = context.Path.Trim('/');
+		if (!string.Equals(route, "sales-chart", StringComparison.OrdinalIgnoreCase))
+		{
+			return;
+		}
+
+		var isAlreadyLoaded = _lazyLoadedAssemblies.Any(assembly =>
+			string.Equals(assembly.GetName().Name, "SalesChartFeature", StringComparison.OrdinalIgnoreCase));
+
+		if (isAlreadyLoaded)
+		{
+			return;
+		}
+
+		var loadedAssemblies = await AssemblyLoader.LoadAssembliesAsync([SalesChartAssemblyName]);
+		_lazyLoadedAssemblies.AddRange(loadedAssemblies);
+	}
+}
